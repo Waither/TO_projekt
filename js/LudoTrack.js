@@ -5,7 +5,6 @@ export function createPlusTrackDefinition() {
         Array.from({ length: size }, () => 'blocked')
     );
 
-    // Obiekt do mapowania: trackIndex -> {row, col}
     const mapPosition = {};
 
     let trackIndex = 0;

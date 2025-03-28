@@ -6,12 +6,13 @@ export class Board {
         }
     }
 
-    render(players, boardLayout) {
-        // boardLayout to np. tablica 15×15 z informacją: 'track', 'homeR', 'startR', 'blocked', itp.
+    render(players, trackDefinition) {
+        const boardLayout = trackDefinition.boardLayout;
+        // Generowanie tabeli na podstawie boardLayout:
         const rows = boardLayout.length;
         const cols = boardLayout[0].length;
+    
         let html = `<table class="ludo-board">`;
-
         for (let r = 0; r < rows; r++) {
             html += `<tr>`;
             for (let c = 0; c < cols; c++) {
@@ -21,16 +22,23 @@ export class Board {
             html += `</tr>`;
         }
         html += `</table>`;
-
+    
         this.container.innerHTML = html;
-
-        // Teraz rysujemy pionki
+    
+        // Rysowanie pionków
         players.forEach(player => {
             player.pieces.forEach(piece => {
                 if (!piece.finished) {
-                    const { row, col } = this.mapPositionToCoords(piece.position, player.id, boardLayout);
-                    if (row !== null && col !== null) {
-                        const cell = this.container.querySelector(`td[data-row="${row}"][data-col="${col}"]`);
+                    // Tu zamiast boardLayout.mapPosition => trackDefinition.mapPosition
+                    const coords = this.mapPositionToCoords(
+                        piece.position,
+                        player.id,
+                        trackDefinition.mapPosition // <--- przekazujesz
+                    );
+                    if (coords && coords.row !== null) {
+                        const cell = this.container.querySelector(
+                            `td[data-row="${coords.row}"][data-col="${coords.col}"]`
+                        );
                         if (cell) {
                             cell.innerHTML += `<div class="piece" style="background-color:${player.color}"></div>`;
                         }
@@ -38,27 +46,18 @@ export class Board {
                 }
             });
         });
-        
     }
-
-    /**
-     * Zamiana piece.position (np. 0..51, -1, 100..105) na (row, col) w boardLayout
-     */
-    mapPositionToCoords(position, playerId, boardLayout) {
+    
+    mapPositionToCoords(position, playerId, mapPosition) {
         if (position === -1) {
-            // Baza – w prawdziwej implementacji mamy 4 pola bazy dla każdego gracza
-            // Tu dla uproszczenia zwróć null, col – pionek się nie wyświetli
             return { row: null, col: null };
         }
-
-        // Przeszukaj boardLayout i znajdź komórkę, która ma przypisane pole (np. trackIndex=pos)
-        // lub homeIndex=pos. Można trzymać w boardLayout obiekt z polami, a nie tylko string.
-        // Tu – uproszczenie. Np. w LudoTrack.js masz mapPosition: {0:{row, col}, 1:{row, col}...}
-        // W takim wypadku wystarczy:
-        const coords = boardLayout.mapPosition[position + '_' + playerId];
-        if (coords) {
-            return coords;
-        }
-        return { row: null, col: null };
+        // Zamiast boardLayout.mapPosition => bezpośrednio mapPosition
+        // Ewentualnie, jeśli używasz klucza "position + '_' + playerId":
+        const coords = mapPosition[position + '_' + playerId];
+        // lub, jeśli wystarczy klucz "position":
+        // const coords = mapPosition[position];
+        return coords || { row: null, col: null };
     }
+    
 }

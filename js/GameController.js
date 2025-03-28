@@ -41,8 +41,10 @@ export class GameController {
 
     render() {
         // Renderujemy planszę i pionki
-        this.board.render(this.state.players, this.trackDefinition.boardLayout);
-        this.updateStatus();
+        this.trackDefinition = createPlusTrackDefinition(); 
+        // => { boardLayout, mapPosition }
+        this.board.render(this.state.players, this.trackDefinition);
+
     }
 
     updateStatus() {
