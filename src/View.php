@@ -5,101 +5,114 @@ namespace Monitoring;
 class View {
     public function renderDeviceStatus($devices) {
         // Grupowanie urządzeń po typie
-        $servers = [];
-        $routers = [];
-        $switches = [];
+        $groupedDevices = [
+            'Servers' => [],
+            'Routers' => [],
+            'Switches' => []
+        ];
 
-        // Przypisywanie urządzeń do odpowiednich tablic
+        // Przypisywanie urządzeń do odpowiednich grup
         foreach ($devices as $device) {
             if ($device instanceof Server) {
-                $servers[] = $device;
-            } elseif ($device instanceof Router) {
-                $routers[] = $device;
-            } elseif ($device instanceof SwitchDevice) {
-                $switches[] = $device;
+                $groupedDevices['Servers'][] = $device;
+            }
+            elseif ($device instanceof Router) {
+                $groupedDevices['Routers'][] = $device;
+            }
+            elseif ($device instanceof SwitchDevice) {
+                $groupedDevices['Switches'][] = $device;
             }
         }
 
         // Wyświetlanie urządzeń w kontenerze
         echo "<div class='devices-container'>";
-
-        // Wyświetlanie nagłówka i urządzeń dla serwerów
-        if (count($servers) > 0) {
-            echo "<div class='device-category'>";
-            echo "<h1 class='category-header'>Servers</h1>";
-            echo "<div class='device-items'>";
-            foreach ($servers as $device) {
-                $this->renderDevice($device);
+        echo "<h1 class='header'>Device Tracker</h1>";
+        $selectedAnalysis = isset($_COOKIE['monitoring_strategy']) ? htmlspecialchars($_COOKIE['monitoring_strategy']) : 'default';
+        echo "
+        <p class='header'>Analysis Type: 
+            <select name='analysis_type' id='analysis_type' onchange='updateAnalysisType(this.value)'>
+                <option value='simple'" . ($selectedAnalysis === 'simple' ? ' selected' : '') . ">Simple</option>
+                <option value='advanced'" . ($selectedAnalysis === 'advanced' ? ' selected' : '') . ">Advanced</option>
+            </select>
+        </p>";
+        echo "
+        <script>
+            function updateAnalysisType(value) {
+                document.cookie = 'monitoring_strategy=' + value + '; path=/';
+                location.reload();
             }
-            echo "</div></div>";
-        }
+        </script>";
 
-        // Wyświetlanie nagłówka i urządzeń dla routerów
-        if (count($routers) > 0) {
-            echo "<div class='device-category'>";
-            echo "<h1 class='category-header'>Routers</h1>";
-            echo "<div class='device-items'>";
-            foreach ($routers as $device) {
-                $this->renderDevice($device);
+        // Iteracja po grupach urządzeń
+        foreach ($groupedDevices as $category => $devices) {
+            if (count($devices) > 0) {
+                echo "<div class='device-category'>";
+                echo "<h1 class='category-header'>{$category}</h1>";
+                echo "<div class='device-items'>";
+                foreach ($devices as $device) {
+                    $this->renderDevice($device);
+                }
+                echo "</div></div>";
             }
-            echo "</div></div>";
-        }
-
-        // Wyświetlanie nagłówka i urządzeń dla switchy
-        if (count($switches) > 0) {
-            echo "<div class='device-category'>";
-            echo "<h1 class='category-header'>Switches</h1>";
-            echo "<div class='device-items'>";
-            foreach ($switches as $device) {
-                $this->renderDevice($device);
-            }
-            echo "</div></div>";
-        }
-
-        echo "</div>"; // end devices-container
-    }
-
-    // Funkcja pomocnicza do renderowania pojedynczego urządzenia
-    private function renderDevice($device) {
-        echo "<div class='device'>";
-        echo "<h3>{$device->getName()}</h3>";
-        echo "<p>IP: {$device->getIp()}</p>";
-        echo "<p>Status: <span class='" . ($device->getStatus() == 'DOWN' ? 'down' : 'ok') . "'>{$device->getStatus()}</span></p>";
-        
-        // Wyświetlanie specyficznych informacji w zależności od typu urządzenia
-        if ($device instanceof Server) {
-            $services = implode(', ', $device->getServices());
-            echo "<p>Usługi: {$services}</p>";  // Usługi serwera
-            echo "<p>CPU: {$device->getCpuUsage()}%, RAM: {$device->getRamUsage()}%, Dysk: {$device->getDiskSpace()}%</p>";  // Zasoby serwera
-        } elseif ($device instanceof Router) {
-            echo "<p>Protokół routingu: {$device->getRoutingProtocol()}</p>";  // Protokół routingu routera
-            echo "<p>Aktywne połączenia: {$device->getActiveConnections()}</p>";  // Aktywne połączenia
-            echo "<p>Interfejsy: </p><ul>";
-            foreach ($device->getInterfaces() as $interface => $status) {
-                echo "<li>{$interface}: {$status}</li>";
-            }
-            echo "</ul>";
-        } elseif ($device instanceof SwitchDevice) {
-            echo "<p>Liczba portów: {$device->getPortsCount()}</p>";  // Liczba portów switcha
-            echo "<p>Zajęte porty: {$device->getUsedPortsCount()}/{$device->getPortsCount()}</p>";  // Zajęte porty switcha
-            
-            // Wyświetlanie statusu portów w kompaktowej formie (np. "P: Zajęty, P: Wolny")
-            $portStatus = [];
-            for ($i = 0; $i < $device->getPortsCount(); $i++) {
-                $portStatus[] = $device->getPortStatus($i) == "Zajęty" ? "Z" : "W";  // Skrót "Z" dla zajętych, "W" dla wolnych
-            }
-            echo "<p>Status portów: " . implode(', ', $portStatus) . "</p>";  // Kompaktowy status portów
         }
 
         echo "</div>";
     }
 
+    // Funkcja do renderowania pojedynczego urządzenia
+    private function renderDevice($device) {
+        $selectedAnalysis = isset($_COOKIE['monitoring_strategy']) ? htmlspecialchars($_COOKIE['monitoring_strategy']) : 'simple';
+
+        echo "<div class='device'>";
+        echo "<h3>{$device->getName()}</h3>";
+        echo "<p>IP: {$device->getIp()}</p>";
+        echo "<p>Status: <span class='".($device->getStatus() == 'NOK' ? 'down' : 'ok')."'>{$device->getStatus()}</span></p>";
+        
+        // Wyświetlanie specyficznych informacji w zależności od typu urządzenia
+        if ($device instanceof Server) {
+            $services = implode(', ', $device->getServices());
+            echo "<p>Usługi: {$services}</p>";
+            if ($selectedAnalysis === 'advanced') {
+                echo "<p>CPU: {$device->getCpuUsage()}%<br>RAM: {$device->getRamUsage()}%<br>Dysk: {$device->getDiskSpace()}%</p>";
+            }
+        }
+        elseif ($device instanceof Router) {
+            if ($selectedAnalysis === 'advanced') {
+                echo "<p>Protokół routingu: {$device->getRoutingProtocol()}</p>";
+                echo "<p>Aktywne połączenia: {$device->getActiveConnections()}</p>";
+                echo "<p>Interfejsy: </p><ul>";
+                foreach ($device->getInterfaces() as $interface => $status) {
+                    echo "<li>{$interface}: {$status}</li>";
+                }
+                echo "</ul>";
+            }
+        }
+        elseif ($device instanceof SwitchDevice) {
+            echo "<p>Liczba portów: {$device->getPortsCount()}</p>";
+            if ($selectedAnalysis === 'advanced') {
+                $usedPorts = $device->getUsedPortsCount();
+                $ports = $device->getPortsCount();
+                $percentUsed = $device->getPercentUsed();
+                
+                echo "<p>Zajęte porty: {$usedPorts}/{$ports} ({$percentUsed}%)</p>";
+                
+                $portStatus = [];
+                for ($i = 0; $i < $device->getPortsCount(); $i++) {
+                    $portStatus[] = $device->getPortStatus($i) == "Zajęty" ? "Z" : "W";
+                }
+                echo "<p>Status portów:<br>".implode(', ', $portStatus)."</p>";
+            }
+        }
+
+        echo "</div>";
+    }
+
+    // Stały kontener dla alertów
     public function renderAlerts($alerts) {
-        // Dodajemy stały kontener dla alertów
         echo "<div class='alertDiv'>";
         if (!empty($alerts)) {
             foreach ($alerts as $alert) {
-                echo "<div class='alert'>{$alert}</div>";
+                echo $alert->getAlert();
             }
         }
         echo "</div>";

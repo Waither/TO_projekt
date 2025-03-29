@@ -3,62 +3,56 @@
 namespace Monitoring;
 
 class Server extends Device {
-    private $services;
-    private $cpuUsage;
-    private $ramUsage;
-    private $diskSpace;
+    private array $services;
+    private int $cpuUsage;
+    private int $ramUsage;
+    private int $diskSpace;
 
-    public function __construct($name, $ip, $services = [], $status = "up") {
-        parent::__construct($name, $ip);
-        $this->services = $services;
-        $this->status = $status;
-        $this->updateUsage();
+    public function __construct(string $name, string $ip, array $additionalParams, string $status = "OK") {
+        parent::__construct($name, $ip, $status);
+        $this->services = $additionalParams["services"] ?? [];
+        $this->updateUsage($additionalParams["usage"] ?? []);
     }
 
-    private function updateUsage() {
+    private function updateUsage(array $usages = []): void {
         if ($this->status === "OK") {
-            $this->cpuUsage = rand(1, 100);
-            $this->ramUsage = rand(1, 100);
-            $this->diskSpace = rand(1, 100);
+            $this->cpuUsage = $usages["cpu"] ?? rand(10, 100);
+            $this->ramUsage = $usages["ram"] ?? rand(10, 100);
+            $this->diskSpace = $usages["disk"] ?? rand(10, 100);
         }
-        else {
+        elseif ($this->status === "NOK") {
             $this->cpuUsage = 0;
             $this->ramUsage = 0;
             $this->diskSpace = 0;
         }
     }
 
-    public function setStatus($status) {
+    public function setStatus(string $status): void {
         $this->status = $status;
-        $this->updateUsage();
+        if ($this->status === "NOK") $this->updateUsage();
     }
-
-    public function getStatus() {
+ 
+    public function getStatus(): string {
         return $this->status;
     }
 
-    public function getServices() {
+    public function getServices(): array {
         return $this->services;
     }
 
-    public function addService($service) {
+    public function addService(string $service): void {
         $this->services[] = $service;
     }
 
-    public function getCpuUsage() {
+    public function getCpuUsage(): int {
         return $this->cpuUsage;
     }
 
-    public function getRamUsage() {
+    public function getRamUsage(): int {
         return $this->ramUsage;
     }
 
-    public function getDiskSpace() {
+    public function getDiskSpace(): int {
         return $this->diskSpace;
-    }
-
-    public function getDeviceInfo() {
-        $servicesList = implode(', ', $this->services);
-        return parent::getDeviceInfo() . ", Status: {$this->status}, Usługi: {$servicesList}, CPU: {$this->cpuUsage}%, RAM: {$this->ramUsage}%, Dysk: {$this->diskSpace}%";
     }
 }

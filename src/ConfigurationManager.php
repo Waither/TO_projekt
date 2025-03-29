@@ -3,7 +3,9 @@
 namespace Monitoring;
 
 class ConfigurationManager {
-    public function configureDevice(Device $device, $newStatus) {
+
+    // Ustawienie statusu urządzenia
+    public function configureDevice(Device $device, string $newStatus) {
         $device->setStatus($newStatus);
     }
 }

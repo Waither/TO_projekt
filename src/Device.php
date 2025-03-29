@@ -3,33 +3,29 @@
 namespace Monitoring;
 
 class Device {
-    protected $name;
-    protected $ip;
-    protected $status;
+    protected string $name;
+    protected string $ip;
+    protected string $status;
 
-    public function __construct($name, $ip) {
+    public function __construct($name, $ip, $status = null) {
         $this->name = $name;
         $this->ip = $ip;
-        $this->status = 'OK';
+        $this->status = $status ?? rand(0, 4) ? 'OK' : 'NOK';
     }
 
-    public function getStatus() {
+    public function getStatus(): string {
         return $this->status;
     }
 
-    public function setStatus($status) {
+    public function setStatus(string $status): void {
         $this->status = $status;
     }
 
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 
-    public function getIp() {
+    public function getIp(): string {
         return $this->ip;
-    }
-
-    public function getDeviceInfo() {
-        return "Urządzenie: {$this->name}, IP: {$this->ip}, Status: {$this->status}";
     }
 }

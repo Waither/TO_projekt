@@ -3,8 +3,17 @@
 namespace Monitoring;
 
 class Alert {
-    public function sendAlert(Device $device) {
-        // Zwracamy HTML, który dodaje alert do stałego kontenera alertDiv
-        echo "<div class='alert'>Alert: Urządzenie {$device->getName()} o IP {$device->getIp()} jest {$device->getStatus()}.</div>";
+    private string $deviceName;
+    private string $message;
+    private string $timestamp;
+
+    public function __construct(string $deviceName, string $message, string $timestamp) {
+        $this->deviceName = $deviceName;
+        $this->message = $message;
+        $this->timestamp = $timestamp;
+    }
+
+    public function getAlert(): void {
+        echo "<div class='alert'>{$this->deviceName} | {$this->message}</div>";
     }
 }

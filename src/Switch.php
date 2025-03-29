@@ -3,17 +3,27 @@
 namespace Monitoring;
 
 class SwitchDevice extends Device {
-    private $ports;  // Tablica przechowująca stan każdego portu (true/false)
+    private $ports = [];
 
-    public function __construct($name, $ip, $ports = 24) {
+    public function __construct(string $name, string $ip, int $ports) {
         parent::__construct($name, $ip);
         
-        $this->ports = [];
         for ($i = 0; $i < $ports; $i++) {
-            $this->ports[] = rand(0, 1) == 1;  // Losujemy true/false dla każdego portu
+            $this->ports[] = (bool)rand(0, 5);
         }
     }
 
+    // Zmiana statusu portu na zajęty (true) lub wolny (false)
+    public function setStatus(string $status): void {
+        $this->status = $status;
+        if ($this->status === "NOK") {
+            foreach ($this->ports as $index => $port) {
+                $this->ports[$index] = false; // Ustawienie wszystkich portów na wolne
+            }
+        }
+    }
+
+    // Zliczenie wszystkich portów
     public function getPortsCount(): int {
         return count($this->ports);
     }
@@ -25,15 +35,18 @@ class SwitchDevice extends Device {
         }));
     }
 
+    // Zliczanie procentu zajęcia portów
+    public function getPercentUsed(): float {
+        $usedPorts = $this->getUsedPortsCount();
+        $totalPorts = $this->getPortsCount();
+        return $totalPorts > 0 ? round(($usedPorts / $totalPorts) * 100) : 0;
+    }
+
     // Sprawdzenie statusu konkretnego portu (zajęty / wolny)
     public function getPortStatus($portIndex): string {
         if ($portIndex >= 0 && $portIndex < $this->getPortsCount()) {
             return $this->ports[$portIndex] ? "Zajęty" : "Wolny";
         }
         return "Nieprawidłowy port.";
-    }
-
-    public function getDeviceInfo(): string {
-        return parent::getDeviceInfo() . ", Liczba portów: {$this->getPortsCount()}, Zajęte porty: {$this->getUsedPortsCount()}/{$this->getPortsCount()}";
     }
 }

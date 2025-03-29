@@ -4,47 +4,33 @@ namespace Monitoring;
 
 class Controller {
     private $monitor;
-    private $alert;
     private $log;
     private $configManager;
     private $alerts = [];
 
     public function __construct() {
         $this->monitor = Monitor::getInstance(); // Singleton
-        $this->alert = new Alert();
         $this->log = new Log();
         $this->configManager = new ConfigurationManager();
     }
 
-    public function addDevice($type, $name, $ip, $additionalParams = []) {
-        switch ($type) {
-            case 'server':
-                $device = new Server($name, $ip, $additionalParams['services'] ?? []);
-                break;
-            case 'router':
-                $device = new Router($name, $ip, $additionalParams['routingProtocol'] ?? 'RIP');
-                break;
-            case 'switch':
-                $device = new SwitchDevice($name, $ip, $additionalParams['ports'] ?? 24);
-                break;
-            default:
-                throw new \Exception("Unknown device type.");
-        }
-
+    public function addDevice(string $type, string $name, string $ip, mixed $additionalParams = null): void {
+        $device = DeviceFactory::createDevice($type, $name, $ip, $additionalParams); // Factory Method
         $this->monitor->addDevice($device);
     }
+    
 
-    public function monitorDevices() {
+    public function monitorDevices(): void {
         $this->monitor->checkDeviceStatus();
         foreach ($this->monitor->getDevices() as $device) {
             $this->log->logStatus($device);
-            if ($device->getStatus() === 'DOWN') {
-                $this->alerts[] = "Alert: Urządzenie {$device->getName()} jest {$device->getStatus()}.";
+            if ($device->getStatus() === 'NOK') {
+                $this->alerts[] = new Alert($device->getName(), 'Device is down', date('Y-m-d H:i:s'));
             }
         }
     }
 
-    public function configureDevice($name, $newStatus) {
+    public function configureDevice($name, $newStatus): void {
         foreach ($this->monitor->getDevices() as $device) {
             if ($device->getName() === $name) {
                 $this->configManager->configureDevice($device, $newStatus);
@@ -52,16 +38,21 @@ class Controller {
         }
     }
 
-    public function setMonitorStrategy($strategy) {
-        if ($strategy === 'simple') {
-            $this->monitor->setStrategy(new SimpleStatusAnalysis());
+    public function setMonitorStrategy($strategy): void { // Strategy Pattern
+        $strategies = [
+            'simple' => SimpleStatusAnalysis::class,
+            'advanced' => AdvancedStatusAnalysis::class,
+        ];
+
+        if (isset($strategies[$strategy])) {
+            $this->monitor->setStrategy(new $strategies[$strategy]());
         }
-        elseif ($strategy === 'advanced') {
-            $this->monitor->setStrategy(new AdvancedStatusAnalysis());
+        else {
+            throw new \InvalidArgumentException("Unknown strategy: $strategy");
         }
     }
 
-    public function getDevices() {
+    public function getDevices(): array {
         return $this->monitor->getDevices();
     }
 

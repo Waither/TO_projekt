@@ -16,6 +16,28 @@
 
     use Monitoring\Controller;
     use Monitoring\View;
+
+    $controller = new Controller();
+    $controller->addDevice('server', 'Server 1', '192.168.1.3', ['services' => ['HTTP', 'FTP']]);
+    $controller->addDevice('router', 'Router 1', '192.168.1.1');
+    $controller->addDevice('switch', 'Switch 1', '192.168.1.2', 48);
+    $controller->addDevice('server', 'Server 2', '192.168.1.4', ['services' => ['SSH', 'MySQL']]);
+    $controller->addDevice('router', 'Router 2', '192.168.1.5', ['routingProtocol' => 'BGP']);
+    $controller->addDevice('switch', 'Switch 2', '192.168.1.6');
+    $controller->addDevice('server', 'Server 3', '192.168.1.7', ['services' => ['DNS', 'SMTP']]);
+    $controller->addDevice('router', 'Router 3', '192.168.1.8', ['routingProtocol' => 'EIGRP']);
+    $controller->addDevice('switch', 'Switch 3', '192.168.1.9', 12);
+    $controller->addDevice('server', 'Localhost Server', '127.0.0.1', ['services' => ['IIS'], 'usage' => ['cpu' => 10, 'ram' => 76, 'disk' => 56]]);
+
+    $controller->configureDevice('Server 1', 'OK');
+    // $controller->configureDevice('Router 1', 'NOK');
+
+    // Ustawienie strategii analizy statusu na 'simple' lub 'advanced'
+    $strategy = $_COOKIE['monitoring_strategy'] ?? 'simple';
+    $controller->setMonitorStrategy($strategy);
+
+    // Monitorowanie urządzeń
+    $controller->monitorDevices();
 ?>
 
 <!DOCTYPE html>
@@ -23,29 +45,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring urządzeń</title>
+    <title>Device Tracker</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                location.reload();
+            }, 300000); // 5 minut
+        });
+    </script>
 </head>
 <body>
 
 <?php
-    $controller = new Controller();
-    $controller->addDevice('server', 'Server 1', '192.168.1.3', ['services' => ['HTTP', 'FTP']]);
-    $controller->addDevice('router', 'Router 1', '192.168.1.1', ['routingProtocol' => 'OSPF']);
-    $controller->addDevice('switch', 'Switch 1', '192.168.1.2', ['ports' => 48]);
-    $controller->addDevice('server', 'Server 2', '192.168.1.4', ['services' => ['SSH', 'MySQL']]);
-    $controller->addDevice('router', 'Router 2', '192.168.1.5', ['routingProtocol' => 'BGP']);
-    $controller->addDevice('switch', 'Switch 2', '192.168.1.6', ['ports' => 24]);
-    $controller->addDevice('server', 'Server 3', '192.168.1.7', ['services' => ['DNS', 'SMTP']]);
-    $controller->addDevice('router', 'Router 3', '192.168.1.8', ['routingProtocol' => 'EIGRP']);
-    $controller->addDevice('switch', 'Switch 3', '192.168.1.9', ['ports' => 12]);
-
-    // Ustawienie strategii analizy statusu na 'simple'
-    $controller->setMonitorStrategy('simple');
-
-    // Monitorowanie urządzeń
-    $controller->monitorDevices();
-
+    
     // Wyświetlanie wyników na stronie
     $view = new View();
     $view->renderDeviceStatus($controller->getDevices());
