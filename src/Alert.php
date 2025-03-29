@@ -16,4 +16,16 @@ class Alert {
     public function getAlert(): void {
         echo "<div class='alert'>{$this->deviceName} | {$this->message}</div>";
     }
+
+    public function getMessage(): string {
+        return $this->message;
+    }
+
+    public function getTimestamp(): string {
+        return $this->timestamp;
+    }
+
+    public function getDeviceName(): string {
+        return $this->deviceName;
+    }
 }

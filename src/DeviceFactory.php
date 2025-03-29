@@ -20,16 +20,12 @@ class DeviceFactory {
     }
 
     // Można dodać metodę, która utworzy urządzenie na podstawie typu
-    public static function createDevice(string $type, string $name, string $ip, mixed $additionalParams = null): Router|Server|SwitchDevice {
-        switch ($type) {
-            case 'server':
-                return self::createServer($name, $ip, $additionalParams ?? []);
-            case 'router':
-                return self::createRouter($name, $ip, $additionalParams['routingProtocol'] ?? 'RIP');
-            case 'switch':
-                return self::createSwitch($name, $ip, $additionalParams ?? 24);
-            default:
-                throw new \Exception("Unknown device type.");
-        }
+    public static function createDevice(string $type, string $name, string $ip, mixed $additionalParams = null): Device {
+        return match ($type) {
+            'server' => self::createServer($name, $ip, $additionalParams ?? []),
+            'router' => self::createRouter($name, $ip, $additionalParams['routingProtocol'] ?? 'RIP'),
+            'switch' => self::createSwitch($name, $ip, $additionalParams ?? 24),
+            default => throw new \Exception("Unknown device type."),
+        };
     }
 }

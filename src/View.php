@@ -112,7 +112,7 @@ class View {
         echo "<div class='alertDiv'>";
         if (!empty($alerts)) {
             foreach ($alerts as $alert) {
-                echo $alert->getAlert();
+                $alert->getAlert();
             }
         }
         echo "</div>";

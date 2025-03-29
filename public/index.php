@@ -5,6 +5,10 @@
     require_once '../src/Switch.php';
     require_once '../src/Monitor.php';
     require_once '../src/Alert.php';
+    require_once '../src/ObserverInterface.php';
+    require_once '../src/Subject.php';
+    require_once '../src/AlertLogger.php';
+    require_once '../src/AlertNotifier.php';
     require_once '../src/Log.php';
     require_once '../src/ConfigurationManager.php';
     require_once '../src/StatusAnalysisStrategy.php';
@@ -16,8 +20,14 @@
 
     use Monitoring\Controller;
     use Monitoring\View;
+    use Monitoring\AlertLogger;
+    use Monitoring\AlertNotifier;
 
     $controller = new Controller();
+
+    $controller->attach(new AlertLogger());
+    $controller->attach(new AlertNotifier());
+
     $controller->addDevice('server', 'Server 1', '192.168.1.3', ['services' => ['HTTP', 'FTP']]);
     $controller->addDevice('router', 'Router 1', '192.168.1.1');
     $controller->addDevice('switch', 'Switch 1', '192.168.1.2', 48);
