@@ -19,7 +19,7 @@ class DeviceFactory {
         return new SwitchDevice($name, $ip, $ports);
     }
 
-    // Można dodać metodę, która utworzy urządzenie na podstawie typu
+    // Tworzenie urządzenia na podstawie typu
     public static function createDevice(string $type, string $name, string $ip, mixed $additionalParams = null): Device {
         return match ($type) {
             'server' => self::createServer($name, $ip, $additionalParams ?? []),
