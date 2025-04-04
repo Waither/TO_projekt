@@ -2,7 +2,7 @@
 
 namespace Monitoring;
 
-class Device {
+abstract class Device {
     protected string $name;
     protected string $ip;
     protected string $status;
@@ -28,4 +28,7 @@ class Device {
     public function getIp(): string {
         return $this->ip;
     }
+
+    // Metoda abstrakcyjna do implementacji w klasach pochodnych
+    abstract protected function analyzeSpecifics(): string;
 }

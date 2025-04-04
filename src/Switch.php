@@ -23,6 +23,13 @@ class SwitchDevice extends Device {
         }
     }
 
+    public function analyzeSpecifics(): string {
+        $usedPorts = $this->getUsedPortsCount();
+        $ports = $this->getPortsCount();
+        $percentUsed = $this->getPercentUsed();
+        return "Liczba portów: {$ports}<br>Zajęte porty: {$usedPorts}/{$ports} ({$percentUsed}%)";
+    }
+
     // Zliczenie wszystkich portów
     public function getPortsCount(): int {
         return count($this->ports);

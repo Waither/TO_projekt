@@ -1,0 +1,152 @@
+@startuml UML
+skinparam classAttributeIconSize 0
+
+namespace Monitoring {
+    abstract class Device {
+        # string name
+        # string ip
+        # string status
+        + __construct(string name, string ip, string status = null)
+        + getStatus(): string
+        + setStatus(string status): void
+        + getName(): string
+        + getIp(): string
+        + analyzeSpecifics(): string
+    }
+
+    class Server extends Device {
+        - array services
+        - int cpuUsage
+        - int ramUsage
+        - int diskSpace
+        + __construct(string name, string ip, array additionalParams, string status = "OK")
+        + getServices(): array
+        + getCpuUsage(): int
+        + getRamUsage(): int
+        + getDiskSpace(): int
+        + analyzeSpecifics(): string
+    }
+
+    class Router extends Device {
+        - string routingProtocol
+        - int activeConnections
+        - array interfaces
+        + __construct(string name, string ip, string routingProtocol = "RIP")
+        + getRoutingProtocol(): string
+        + getActiveConnections(): int
+        + getInterfaces(): array
+        + getActiveInterfaces(): int
+        + analyzeSpecifics(): string
+    }
+
+    class SwitchDevice extends Device {
+        - array ports
+        + __construct(string name, string ip, int ports)
+        + getPortsCount(): int
+        + getUsedPortsCount(): int
+        + getPercentUsed(): float
+        + analyzeSpecifics(): string
+    }
+
+    class DeviceFactory {
+        - createServer(string name, string ip, array services = []): Server
+        - createRouter(string name, string ip, string routingProtocol = "RIP"): Router
+        - createSwitch(string name, string ip, int ports): SwitchDevice
+        + createDevice(string type, string name, string ip, mixed additionalParams = null): Device
+    }
+
+    class Monitor {
+        - static Monitor instance
+        - array devices
+        - StatusAnalysisStrategy strategy
+        + getInstance(): Monitor
+        + setStrategy(StatusAnalysisStrategy strategy): void
+        + addDevice(Device device): void
+        + checkDeviceStatus(): void
+        + getDevices(): array
+    }
+
+    interface StatusAnalysisStrategy {
+        + analyzeStatus(Device device): string
+    }
+
+    class SimpleStatusAnalysis implements StatusAnalysisStrategy {
+        + analyzeStatus(Device device): string
+    }
+
+    class AdvancedStatusAnalysis implements StatusAnalysisStrategy {
+        + analyzeStatus(Device device): string
+    }
+
+    class Subject {
+        - array observers
+        + attach(ObserverInterface observer): void
+        + detach(ObserverInterface observer): void
+        + notify(Alert alert): void
+    }
+
+    interface ObserverInterface {
+        + update(Alert alert): void
+    }
+
+    class AlertNotifier implements ObserverInterface {
+        - array alerts
+        + update(Alert alert): void
+        + getAlerts(): array
+    }
+
+    class AlertLogger implements ObserverInterface {
+        + update(Alert alert): void
+    }
+
+    class Alert {
+        - string deviceName
+        - string message
+        - string timestamp
+        + __construct(string deviceName, string message, string timestamp)
+        + getDeviceName(): string
+        + getMessage(): string
+        + getTimestamp(): string
+    }
+
+    class ConfigurationManager {
+        + configureDevice(Device device, string newStatus): void
+    }
+
+    class Log {
+        + logStatus(Device device): void
+    }
+
+    class Controller extends Subject {
+        - Monitor monitor
+        - Log log
+        - ConfigurationManager configManager
+        - AlertNotifier alertNotifier
+        + __construct()
+        + addDevice(string type, string name, string ip, mixed additionalParams = null): void
+        + monitorDevices(): void
+        + configureDevice(string name, string newStatus): void
+        + setMonitorStrategy(string strategy): void
+        + getDevices(): array
+        + getAlerts(): array
+    }
+
+    class View {
+        + renderDeviceStatus(array devices): void
+        + renderAlerts(array alerts): void
+    }
+
+    DeviceFactory --> Device : "creates"
+    Monitor *-- Device : "manages"
+    Monitor --> StatusAnalysisStrategy : "uses"
+    Subject o-- ObserverInterface : "notifies"
+    Controller *-- Monitor : "uses"
+    Controller *-- Log : "uses"
+    Controller *-- ConfigurationManager : "uses"
+    Controller *-- AlertNotifier : "uses"
+    Controller --> Alert : "creates"
+    View --> Device : "renders"
+    View --> Alert : "renders"
+}
+
+@enduml

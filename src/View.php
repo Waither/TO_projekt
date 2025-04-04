@@ -61,49 +61,13 @@ class View {
 
     // Funkcja do renderowania pojedynczego urządzenia
     private function renderDevice($device) {
-        $selectedAnalysis = isset($_COOKIE['monitoring_strategy']) ? htmlspecialchars($_COOKIE['monitoring_strategy']) : 'simple';
-
         echo "<div class='device'>";
         echo "<h3>{$device->getName()}</h3>";
         echo "<p>IP: {$device->getIp()}</p>";
         echo "<p>Status: <span class='".($device->getStatus() == 'NOK' ? 'down' : 'ok')."'>{$device->getStatus()}</span></p>";
-        
-        // Wyświetlanie specyficznych informacji w zależności od typu urządzenia
-        if ($device instanceof Server) {
-            $services = implode(', ', $device->getServices());
-            echo "<p>Usługi: {$services}</p>";
-            if ($selectedAnalysis === 'advanced') {
-                echo "<p>CPU: {$device->getCpuUsage()}%<br>RAM: {$device->getRamUsage()}%<br>Dysk: {$device->getDiskSpace()}%</p>";
-            }
+        if ($_COOKIE['monitoring_strategy'] === 'advanced') {
+            echo "<p>{$device->analyzeSpecifics()}</p>";
         }
-        elseif ($device instanceof Router) {
-            if ($selectedAnalysis === 'advanced') {
-                echo "<p>Protokół routingu: {$device->getRoutingProtocol()}</p>";
-                echo "<p>Aktywne połączenia: {$device->getActiveConnections()}</p>";
-                echo "<p>Interfejsy: </p><ul>";
-                foreach ($device->getInterfaces() as $interface => $status) {
-                    echo "<li>{$interface}: {$status}</li>";
-                }
-                echo "</ul>";
-            }
-        }
-        elseif ($device instanceof SwitchDevice) {
-            echo "<p>Liczba portów: {$device->getPortsCount()}</p>";
-            if ($selectedAnalysis === 'advanced') {
-                $usedPorts = $device->getUsedPortsCount();
-                $ports = $device->getPortsCount();
-                $percentUsed = $device->getPercentUsed();
-                
-                echo "<p>Zajęte porty: {$usedPorts}/{$ports} ({$percentUsed}%)</p>";
-                
-                $portStatus = [];
-                for ($i = 0; $i < $device->getPortsCount(); $i++) {
-                    $portStatus[] = $device->getPortStatus($i) == "Zajęty" ? "Z" : "W";
-                }
-                echo "<p>Status portów:<br>".implode(', ', $portStatus)."</p>";
-            }
-        }
-
         echo "</div>";
     }
 

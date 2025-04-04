@@ -7,7 +7,6 @@ class AlertNotifier implements ObserverInterface {
 
     // Dodaj alert do tablicy
     public function update(Alert $alert): void {
-        
         $this->alerts[] = $alert;
     }
 

@@ -53,38 +53,16 @@ Aplikacja składa się z trzech głównych warstw zgodnie z architekturą **MVC 
 
 ---
 
-### 5. Dekorator (Decorator)
-- **Opis**: Rozszerza funkcjonalność obiektów w sposób dynamiczny.
-- **Miejsce implementacji**:  
-  - Klasa `AdvancedStatusAnalysis` (`src/AdvancedStatusAnalysis.php`) – dodaje alerty do statusu urządzeń.
-
----
-
-### 6. MVC (Model-View-Controller)
+### 5. MVC (Model-View-Controller)
 - **Opis**: Organizuje aplikację w trzy warstwy: Model, Widok i Kontroler.
 - **Miejsce implementacji**:  
   - **Model**: Klasy `Device`, `Server`, `Router`, `SwitchDevice`, `Monitor` (`src/Device.php`, `src/Server.php`, `src/Router.php`, `src/Switch.php`, `src/Monitor.php`).  
-  - **View**: Klasa `View` (`src/View.php`).  
+  - **View**: Klasa `View` (`src/View.php`) – wykorzystuje metodę `analyzeSpecifics()` z klasy `Device` do dynamicznego renderowania szczegółów urządzeń.  
   - **Controller**: Klasa `Controller` (`src/Controller.php`).
 
 ---
 
-### 7. Szablonowa Metoda (Template Method)
-- **Opis**: Definiuje ogólną strukturę algorytmu w klasie bazowej, a szczegóły implementacji pozostawia klasom pochodnym.
+### 6. Szablonowa Metoda (Template Method)
+- **Opis**: Definiuje szkielet algorytmu w klasie bazowej, a szczegóły implementacji pozostawia klasom pochodnym.
 - **Miejsce implementacji**:  
-  - Klasa `Device` (`src/Device.php`) jako klasa bazowa.  
-  - Klasy pochodne: `Server` (`src/Server.php`), `Router` (`src/Router.php`), `SwitchDevice` (`src/Switch.php`).
-
----
-
-### 8. Kompozyt (Composite)
-- **Opis**: Umożliwia traktowanie grupy obiektów i pojedynczych obiektów w ten sam sposób.
-- **Miejsce implementacji**:  
-  - Klasa `Controller` (`src/Controller.php`) zarządza różnymi komponentami systemu, takimi jak `Monitor`, `Log`, `ConfigurationManager`, `AlertNotifier`.
-
----
-
-### 9. Adapter (Adapter)
-- **Opis**: Zapewnia zunifikowany interfejs do współpracy z różnymi klasami.
-- **Miejsce implementacji**:  
-  - Klasa `ConfigurationManager` (`src/ConfigurationManager.php`) – dostarcza zunifikowany sposób konfiguracji urządzeń.
+  - Klasa `Device` (`src/Device.php`) definiuje metodę `analyzeSpecifics()`, która jest implementowana w klasach `Server`, `Router` i `SwitchDevice`.

@@ -6,7 +6,6 @@ class Controller extends Subject {
     private $monitor;
     private $log;
     private $configManager;
-    private $alerts = [];
     private $alertNotifier;
 
     public function __construct() {
@@ -19,6 +18,11 @@ class Controller extends Subject {
 
     public function addDevice(string $type, string $name, string $ip, mixed $additionalParams = null): void {
         $device = DeviceFactory::createDevice($type, $name, $ip, $additionalParams); // Factory Method
+        if ($device === null) {
+            $alert = new Alert($name, "Failed to create device of type: $type", date('Y-m-d H:i:s'));
+            $this->notify($alert); // Powiadom obserwatorów o nowym alercie
+            return;
+        }
         $this->monitor->addDevice($device);
     }
     
@@ -42,7 +46,7 @@ class Controller extends Subject {
         }
     }
 
-    public function setMonitorStrategy($strategy): void { // Strategy Pattern
+    public function setMonitorStrategy($strategy): void { // Strategy
         $strategies = [
             'simple' => SimpleStatusAnalysis::class,
             'advanced' => AdvancedStatusAnalysis::class,
@@ -52,7 +56,8 @@ class Controller extends Subject {
             $this->monitor->setStrategy(new $strategies[$strategy]());
         }
         else {
-            throw new \InvalidArgumentException("Unknown strategy: $strategy");
+            $this->notify(new Alert('Controller', "Unknown strategy: $strategy", date('Y-m-d H:i:s')));
+            $this->monitor->setStrategy(new $strategies["simple"]());
         }
     }
 

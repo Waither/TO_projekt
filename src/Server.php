@@ -27,6 +27,11 @@ class Server extends Device {
         }
     }
 
+    public function analyzeSpecifics(): string {
+        $services = implode(', ', $this->services);
+        return "Usługi: {$services}<br>CPU: {$this->cpuUsage}%<br>RAM: {$this->ramUsage}%<br>Dysk: {$this->diskSpace}%";
+    }
+
     public function setStatus(string $status): void {
         $this->status = $status;
         if ($this->status === "NOK") $this->updateUsage();

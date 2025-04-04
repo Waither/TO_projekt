@@ -31,6 +31,14 @@ class Router extends Device {
         $this->activeConnections = $this->getActiveInterfaces() ? rand(10, 100) : 0;
     }
 
+    public function analyzeSpecifics(): string {
+        $interfaces = '';
+        foreach ($this->interfaces as $interface => $status) {
+            $interfaces .= "{$interface}: {$status}<br>";
+        }
+        return "Protokół routingu: {$this->routingProtocol}<br>Aktywne połączenia: {$this->activeConnections}<br>Interfejsy:<br>{$interfaces}";
+    }
+
     public function setStatus(string $status): void {
         parent::setStatus($status);
         if ($this->status === "NOK") $this->updateConnectionsAndInterfaces();

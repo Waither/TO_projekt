@@ -39,14 +39,18 @@
     $controller->addDevice('switch', 'Switch 3', '192.168.1.9', 12);
     $controller->addDevice('server', 'Localhost Server', '127.0.0.1', ['services' => ['IIS'], 'usage' => ['cpu' => 10, 'ram' => 76, 'disk' => 56]]);
 
+    // Test dodawania urządzeń z niepoprawnym typem
+    $controller->addDevice('router2', 'Router 4', '192.168.1.10', ['routingProtocol' => 'EIGRP']);
+
+    // Test konfiguracji urządzeń
     $controller->configureDevice('Server 1', 'OK');
-    // $controller->configureDevice('Router 1', 'NOK');
+    $controller->configureDevice('Server 2', 'NOK');
+    $controller->configureDevice('Router 1', 'NOK');
 
     // Ustawienie strategii analizy statusu na 'simple' lub 'advanced'
     $strategy = $_COOKIE['monitoring_strategy'] ?? 'simple';
     $controller->setMonitorStrategy($strategy);
 
-    // Monitorowanie urządzeń
     $controller->monitorDevices();
 ?>
 
