@@ -29,10 +29,10 @@ class View {
         echo "<h1 class='header'>Device Tracker</h1>";
         $selectedAnalysis = isset($_COOKIE['monitoring_strategy']) ? htmlspecialchars($_COOKIE['monitoring_strategy']) : 'default';
         echo "
-        <p class='header'>Analysis Type: 
+        <p class='header'>Analysis Type:
             <select name='analysis_type' id='analysis_type' onchange='updateAnalysisType(this.value)'>
-                <option value='simple'" . ($selectedAnalysis === 'simple' ? ' selected' : '') . ">Simple</option>
-                <option value='advanced'" . ($selectedAnalysis === 'advanced' ? ' selected' : '') . ">Advanced</option>
+                <option value='simple'".($selectedAnalysis === 'simple' ? ' selected' : '').">Simple</option>
+                <option value='advanced'".($selectedAnalysis === 'advanced' ? ' selected' : '').">Advanced</option>
             </select>
         </p>";
         echo "
@@ -65,7 +65,7 @@ class View {
         echo "<h3>{$device->getName()}</h3>";
         echo "<p>IP: {$device->getIp()}</p>";
         echo "<p>Status: <span class='".($device->getStatus() == 'NOK' ? 'down' : 'ok')."'>{$device->getStatus()}</span></p>";
-        if ($_COOKIE['monitoring_strategy'] === 'advanced') {
+        if (isset($_COOKIE['monitoring_stategy']) && $_COOKIE['monitoring_strategy'] === 'advanced') {
             echo "<p>{$device->analyzeSpecifics()}</p>";
         }
         echo "</div>";

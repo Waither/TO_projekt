@@ -41,9 +41,6 @@ class AdvancedStatusAnalysis implements StatusAnalysisStrategy {
                     if ($status === 'down') {
                         $alerts[] = "<br><span style=\"color:red;\">Interface {$interface} is down</span>";
                     }
-                    else {
-
-                    }
                 }
             }
             

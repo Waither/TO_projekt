@@ -41,7 +41,9 @@ class Router extends Device {
 
     public function setStatus(string $status): void {
         parent::setStatus($status);
-        if ($this->status === "NOK") $this->updateConnectionsAndInterfaces();
+        if ($this->status === "NOK") {
+            $this->updateConnectionsAndInterfaces();
+        }
     }
 
     public function getRoutingProtocol(): string {

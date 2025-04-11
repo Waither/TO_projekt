@@ -26,7 +26,7 @@ class DeviceFactory {
                 'server' => self::createServer($name, $ip, $additionalParams ?? []),
                 'router' => self::createRouter($name, $ip, $additionalParams['routingProtocol'] ?? 'RIP'),
                 'switch' => self::createSwitch($name, $ip, $additionalParams ?? 24),
-                default => throw new \Exception(),
+                default => throw new \InvalidArgumentException("Invalid device type: $type"),
             };
         }
         catch (\Exception $e) {

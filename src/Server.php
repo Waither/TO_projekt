@@ -34,7 +34,9 @@ class Server extends Device {
 
     public function setStatus(string $status): void {
         $this->status = $status;
-        if ($this->status === "NOK") $this->updateUsage();
+        if ($this->status === "NOK") {
+            $this->updateUsage();
+        }
     }
  
     public function getStatus(): string {
