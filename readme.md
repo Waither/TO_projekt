@@ -28,7 +28,7 @@ Aplikacja składa się z trzech głównych warstw zgodnie z architekturą **MVC 
 ### Instrukcja
 1. Sklonuj repozytorium projektu:
     ```bash
-    git clone https://github.com/Waither/TO_projekt.git
+    git clone https://github.com/Waither/TO_projekt
     cd TO_projekt
     ```
 
