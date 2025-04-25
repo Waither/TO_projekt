@@ -64,8 +64,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
-                location.reload();
-            }, 300000); // 5 minut
+            location.reload();
+            }, 60000); // 1 minuta
         });
     </script>
 </head>
