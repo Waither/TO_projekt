@@ -27,6 +27,7 @@ class View {
         // Wyświetlanie urządzeń w kontenerze
         echo "<div class='devices-container'>";
         echo "<h1 class='header'>Device Tracker</h1>";
+        echo "<div class='header'><button id='addButton'><strong>&#43;</strong> Add devices</button></div>";
         $selectedAnalysis = isset($_COOKIE['monitoring_strategy']) ? htmlspecialchars($_COOKIE['monitoring_strategy']) : 'default';
         echo "
         <p class='header'>Analysis Type:
@@ -65,8 +66,11 @@ class View {
         echo "<h3>{$device->getName()}</h3>";
         echo "<p>IP: {$device->getIp()}</p>";
         echo "<p>Status: <span class='".($device->getStatus() == 'NOK' ? 'down' : 'ok')."'>{$device->getStatus()}</span></p>";
-        if (isset($_COOKIE['monitoring_stategy']) && $_COOKIE['monitoring_strategy'] === 'advanced') {
+        if (isset($_COOKIE['monitoring_strategy']) && $_COOKIE['monitoring_strategy'] === 'advanced') {
             echo "<p>{$device->analyzeSpecifics()}</p>";
+            echo "<div class='device-actions'>";
+            echo "<button class='device-button' data-id='{$device->getID()}'>Details</button>";
+            echo "</div>";
         }
         echo "</div>";
     }

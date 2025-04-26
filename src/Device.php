@@ -3,14 +3,20 @@
 namespace Monitoring;
 
 abstract class Device {
+    protected int $ID;
     protected string $name;
     protected string $ip;
     protected string $status;
 
-    public function __construct($name, $ip, $status = null) {
+    public function __construct(int $ID, string $name, string $ip, bool $status) {
+        $this->ID = $ID;
         $this->name = $name;
         $this->ip = $ip;
-        $this->status = $status ?? rand(0, 4) ? 'OK' : 'NOK';
+        $this->status = $status ? 'OK' : 'NOK';
+    }
+
+    public function getID(): int {
+        return $this->ID;
     }
 
     public function getStatus(): string {

@@ -8,35 +8,17 @@ class Server extends Device {
     private int $ramUsage;
     private int $diskSpace;
 
-    public function __construct(string $name, string $ip, array $additionalParams, string $status = "OK") {
-        parent::__construct($name, $ip, $status);
-        $this->services = $additionalParams["services"] ?? [];
-        $this->updateUsage($additionalParams["usage"] ?? []);
-    }
-
-    private function updateUsage(array $usages = []): void {
-        if ($this->status === "OK") {
-            $this->cpuUsage = $usages["cpu"] ?? rand(10, 100);
-            $this->ramUsage = $usages["ram"] ?? rand(10, 100);
-            $this->diskSpace = $usages["disk"] ?? rand(10, 100);
-        }
-        elseif ($this->status === "NOK") {
-            $this->cpuUsage = 0;
-            $this->ramUsage = 0;
-            $this->diskSpace = 0;
-        }
+    public function __construct(int $ID, string $name, string $ip, bool $status, int $cpu, int $ram, int $disk, array $services) {
+        parent::__construct($ID, $name, $ip, $status);
+        $this->services = $services['services'] ?? [];
+        $this->cpuUsage = $cpu;
+        $this->ramUsage = $ram;
+        $this->diskSpace = $disk;
     }
 
     public function analyzeSpecifics(): string {
         $services = implode(', ', $this->services);
         return "Usługi: {$services}<br>CPU: {$this->cpuUsage}%<br>RAM: {$this->ramUsage}%<br>Dysk: {$this->diskSpace}%";
-    }
-
-    public function setStatus(string $status): void {
-        $this->status = $status;
-        if ($this->status === "NOK") {
-            $this->updateUsage();
-        }
     }
  
     public function getStatus(): string {

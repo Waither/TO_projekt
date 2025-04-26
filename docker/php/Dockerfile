@@ -16,7 +16,8 @@ ENV PHP_EXTENSIONS \
     opcache \
     zip \
     gd \
-    bcmath
+    bcmath \
+    pdo_mysql
 
 RUN apk add --no-cache --virtual .build-deps $BUILD_DEPS \
     && docker-php-ext-configure gd --with-jpeg \

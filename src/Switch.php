@@ -3,14 +3,12 @@
 namespace Monitoring;
 
 class SwitchDevice extends Device {
-    private $ports = [];
+    private array $ports = [];
 
-    public function __construct(string $name, string $ip, int $ports) {
-        parent::__construct($name, $ip);
+    public function __construct(int $ID, string $name, string $ip, $status, array $ports) {
+        parent::__construct($ID, $name, $ip, $status);
         
-        for ($i = 0; $i < $ports; $i++) {
-            $this->ports[] = (bool)rand(0, 5);
-        }
+        $this->ports = $ports;
     }
 
     // Zmiana statusu portu na zajęty (true) lub wolny (false)

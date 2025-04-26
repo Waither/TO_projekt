@@ -7,28 +7,11 @@ class Router extends Device {
     private int $activeConnections;
     private array $interfaces;
 
-    public function __construct($name, $ip, $routingProtocol = 'RIP') {
-        parent::__construct($name, $ip);
+    public function __construct(int $ID, string $name, string $ip, bool $status, string $routingProtocol, int $activeConnections, array $interfaces) {
+        parent::__construct($ID, $name, $ip, $status);
         $this->routingProtocol = $routingProtocol;
-        $this->updateConnectionsAndInterfaces();
-    }
-
-    private function updateConnectionsAndInterfaces(): void {
-        if ($this->status === "NOK") {
-            $this->interfaces = [
-                'eth0' => 'down',
-                'eth1' => 'down',
-                'eth2' => 'down'
-            ];
-        }
-        else {
-            $this->interfaces = [
-            'eth0' => rand(0, 4) ? 'up' : 'down',
-            'eth1' => rand(0, 4) ? 'up' : 'down',
-            'eth2' => rand(0, 4) ? 'up' : 'down'
-            ];
-        }
-        $this->activeConnections = $this->getActiveInterfaces() ? rand(10, 100) : 0;
+        $this->activeConnections = $activeConnections;
+        $this->interfaces = $interfaces;
     }
 
     public function analyzeSpecifics(): string {
@@ -37,13 +20,6 @@ class Router extends Device {
             $interfaces .= "{$interface}: {$status}<br>";
         }
         return "Protokół routingu: {$this->routingProtocol}<br>Aktywne połączenia: {$this->activeConnections}<br>Interfejsy:<br>{$interfaces}";
-    }
-
-    public function setStatus(string $status): void {
-        parent::setStatus($status);
-        if ($this->status === "NOK") {
-            $this->updateConnectionsAndInterfaces();
-        }
     }
 
     public function getRoutingProtocol(): string {

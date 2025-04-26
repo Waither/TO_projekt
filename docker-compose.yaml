@@ -22,9 +22,39 @@ services:
       - .:/app
     networks:
       - pg-network
-  
+    depends_on:
+      - mysql
+
+  mysql:
+    build:
+      context: ./docker/mysql
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - pg-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+    networks:
+      - pg-network
+
 networks:
   pg-network:
 
 volumes:
   pg-data:
+  mysql-data:

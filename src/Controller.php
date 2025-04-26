@@ -16,14 +16,14 @@ class Controller extends Subject {
         $this->attach($this->alertNotifier);
     }
 
-    public function addDevice(string $type, string $name, string $ip, mixed $additionalParams = null): void {
-        $device = DeviceFactory::createDevice($type, $name, $ip, $additionalParams); // Factory Method
-        if ($device === null) {
-            $alert = new Alert($name, "Failed to create device of type: $type", date('Y-m-d H:i:s'));
+    public function addDevice(object $device): void {
+        $deviceObject = DeviceFactory::createDevice($device); // Factory Method
+        if ($deviceObject === null) {
+            $alert = new Alert($device->name, "Failed to create device of type: {$device->type}", date('Y-m-d H:i:s'));
             $this->notify($alert); // Powiadom obserwatorów o nowym alercie
             return;
         }
-        $this->monitor->addDevice($device);
+        $this->monitor->addDevice($deviceObject);
     }
     
 
